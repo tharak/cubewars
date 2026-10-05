@@ -70,7 +70,7 @@ Enemies per wave = `initialEnemies + (wave - 1) * additionalPerWave`. Each enemy
 
 ## Verification and session handoff
 
-Simulation tests cover configuration, formations for every survivor count, movement, rotation/bounds, deterministic randomness, bullet collision/damage/lifetime, enemy behavior, wave timing, defeat, and restart. Browser checks cover keyboard controls, emulated simultaneous touch, pointer cancellation, responsive layouts, and lifecycle. Real-phone performance needs a physical device playtest; browser emulation is not a substitute.
+Simulation tests cover configuration, formations for every survivor count, movement, rotation/bounds, deterministic randomness, bullet collision/damage/lifetime, enemy behavior, wave timing, defeat, and restart. Browser checks cover keyboard controls, emulated simultaneous touch, pointer cancellation, responsive layouts, and lifecycle. Real-phone performance needs a physical device playtest; browser emulation is not a substitute. That follow-up is tracked in [issue #6](https://github.com/tharak/cubewars/issues/6).
 
 GitHub Actions runs type checks, tests, and builds, then deploys successful `main` builds to Pages. Enable GitHub Actions as the repository's Pages source. Never publish builds with failing checks.
 
