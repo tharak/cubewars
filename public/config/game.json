@@ -1,0 +1,10 @@
+{
+  "army": { "initialSize": 25, "spacing": 28, "unitSize": 20, "health": 3, "moveSpeed": 190, "rotationSpeed": 2.5, "transitionSpeed": 300 },
+  "arena": { "width": 1000, "height": 800 },
+  "playerWeapon": { "damage": 1, "interval": 0.8, "speed": 520, "lifetime": 2.7, "radius": 3 },
+  "enemy": { "health": 3, "unitSize": 24, "moveSpeed": 65, "attackRange": 320, "spawnMargin": 30 },
+  "enemyWeapon": { "damage": 1, "interval": 1.7, "speed": 240, "lifetime": 5, "radius": 4 },
+  "waves": { "initialEnemies": 5, "additionalPerWave": 2, "spawnInterval": 0.65, "intermission": 3 },
+  "simulation": { "step": 0.016666666666666666, "maxFrameTime": 0.1 },
+  "input": { "stickDeadzone": 0.12 }
+}

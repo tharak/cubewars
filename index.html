@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#080e16" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>CubeWars</title>
+  </head>
+  <body>
+    <main id="app">
+      <header class="toolbar">
+        <div class="stats">
+          <span class="stat" aria-label="Wave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 15 5-6 4 6 4-6 5 6"/></svg><output id="wave">0</output></span>
+          <span class="stat friendly" aria-label="Surviving cubes"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><output id="survivors">25</output></span>
+        </div>
+        <nav id="formations" aria-label="Formation"></nav>
+        <div class="actions">
+          <button id="pause" aria-label="Start" title="Start"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg></button>
+          <button id="restart" aria-label="Restart" title="Restart"><svg viewBox="0 0 24 24"><path d="M5 8a8 8 0 1 1-1 8M5 3v5h5"/></svg></button>
+        </div>
+      </header>
+      <div id="battlefield"><canvas id="arena" aria-label="CubeWars battlefield"></canvas></div>
+      <div id="touch-controls">
+        <div class="stick" id="move-stick" role="group" aria-label="Move army"><span class="stick-mark">✥</span><span class="thumb"></span></div>
+        <div class="stick" id="aim-stick" role="group" aria-label="Aim army"><span class="stick-mark">◎</span><span class="thumb"></span></div>
+      </div>
+      <button id="center-action" aria-label="Start"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg></button>
+      <span id="error" role="alert" aria-label="Unable to load game" hidden>⚠</span>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+:root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; background: #080e16; color: #b4c5d5; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { -webkit-user-select: none; user-select: none; }
+button { display: grid; place-items: center; width: 44px; height: 44px; padding: 10px; background: transparent; border: 1px solid transparent; border-radius: 10px; color: #8296aa; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+button:hover { color: #e2f3ff; background: #162434; }
+button:focus-visible { outline: 2px solid #79e7e0; outline-offset: 2px; }
+button[aria-pressed="true"] { color: #79e7e0; border-color: #79e7e044; background: #79e7e010; }
+button:disabled { opacity: .3; cursor: default; }
+svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#app { position: relative; height: 100dvh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.toolbar { flex: 0 0 auto; min-height: 72px; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #172331; background: #0a111b; }
+.stats, .actions, nav { display: flex; align-items: center; gap: 6px; }
+.stats { gap: 20px; }
+.stat { display: flex; align-items: center; gap: 8px; font-size: 15px; min-width: 45px; }
+.stat svg { width: 20px; height: 20px; color: #657e96; }
+.stat.friendly svg { color: #79e7e0; }
+output { font-variant-numeric: tabular-nums; }
+#battlefield { flex: 1; min-height: 0; position: relative; }
+canvas { display: block; width: 100%; height: 100%; }
+#center-action { position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%); width: 70px; height: 70px; border-radius: 50%; color: #c7ffff; border: 1px solid #79e7e055; background: #0b1927e8; box-shadow: 0 0 40px #79e7e015; }
+#center-action svg { width: 30px; height: 30px; }
+#app[data-status="over"] #center-action { color: #ff797f; border-color: #ff797f66; }
+[hidden] { display: none !important; }
+#error { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 36px; color: #ff797f; }
+#touch-controls { display: none; flex: 0 0 auto; height: 142px; padding: 8px 24px 12px; justify-content: space-between; align-items: center; }
+body.touch #touch-controls { display: flex; }
+.stick { position: relative; width: 116px; height: 116px; border: 1px solid #294051; border-radius: 50%; background: radial-gradient(circle, #192b3c33, transparent); touch-action: none; }
+.stick::before { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 1px dashed #253849; pointer-events: none; }
+.stick-mark { position: absolute; inset: 0; display: grid; place-items: center; color: #476477; font-size: 25px; pointer-events: none; }
+.thumb { position: absolute; width: 38px; height: 38px; top: calc(50% - 19px); left: calc(50% - 19px); border-radius: 50%; border: 1px solid #65849866; background: #26425366; pointer-events: none; }
+.stick.active { border-color: #79e7e066; }
+.stick.active .thumb { background: #79e7e030; border-color: #79e7e088; }
+@media (max-width: 620px) {
+  .toolbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; min-height: 106px; }
+  .stats { order: 0; gap: 16px; }
+  .actions { order: 1; margin-left: auto; }
+  nav { order: 2; width: 100%; justify-content: center; gap: 12px; }
+  #center-action { top: 43%; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .toolbar { min-height: 54px; padding: 4px 12px; flex-wrap: nowrap; }
+  nav { order: 0; width: auto; gap: 2px; }
+  .actions { order: 0; margin-left: 0; }
+  body.touch #touch-controls { position: absolute; top: calc(54px + env(safe-area-inset-top)); bottom: env(safe-area-inset-bottom); left: env(safe-area-inset-left); right: env(safe-area-inset-right); height: auto; padding: 12px 16px; pointer-events: none; }
+  body.touch #touch-controls .stick { pointer-events: auto; }
+  .stick { width: 88px; height: 88px; }
+  #center-action { top: 50%; }
+}
