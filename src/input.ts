@@ -14,7 +14,7 @@ export class Input {
       if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE', 'Space', 'Escape'].includes(event.code)) event.preventDefault();
       this.keys.add(event.code);
       const number = Number(event.key);
-      if (number >= 1 && number <= 5) onFormation(formations[number - 1]);
+      if (number >= 1 && number <= formations.length) onFormation(formations[number - 1]);
       if (!event.repeat && (event.code === 'Space' || event.code === 'Escape')) onPause();
     });
     window.addEventListener('keyup', event => this.keys.delete(event.code));
@@ -27,7 +27,8 @@ export class Input {
   read(): Commands {
     const key = (name: string) => this.keys.has(name) ? 1 : 0;
     return {
-      move: normalize({ x: key('KeyD') - key('KeyA') + this.touchMove.x, y: key('KeyS') - key('KeyW') + this.touchMove.y }),
+      move: normalize({ x: key('KeyD') - key('KeyA'), y: key('KeyS') - key('KeyW') }),
+      worldMove: this.touchMove,
       rotation: key('KeyE') - key('KeyQ'), aim: this.touchAim,
     };
   }

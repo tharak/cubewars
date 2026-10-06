@@ -1,3 +1,5 @@
+import { formations, formationSlots } from './formations';
+
 export interface WeaponConfig { damage: number; interval: number; speed: number; lifetime: number; radius: number }
 export interface GameConfig {
   army: { initialSize: number; spacing: number; unitSize: number; health: number; moveSpeed: number; rotationSpeed: number; transitionSpeed: number };
@@ -41,8 +43,13 @@ export function validateConfig(value: unknown): GameConfig {
   }
   if (c.army.initialSize > 200) throw new Error('Army size must be at most 200');
   if (c.army.spacing < c.army.unitSize) throw new Error('Army spacing must be at least unit size');
-  const diameter = (c.army.initialSize - 1) * c.army.spacing + Math.SQRT2 * c.army.unitSize;
-  if (Math.min(c.arena.width, c.arena.height) <= diameter) throw new Error('Arena must fit the largest rotated formation');
+  let radius = 0;
+  for (const shape of formations) for (let count = 1; count <= c.army.initialSize; count++) {
+    for (const slot of formationSlots(shape, count, c.army.spacing)) radius = Math.max(radius, Math.hypot(slot.x, slot.y));
+  }
+  if (Math.min(c.arena.width, c.arena.height) <= radius * 2 + Math.SQRT2 * c.army.unitSize) {
+    throw new Error('Arena must fit the largest rotated formation');
+  }
   if (c.input.stickDeadzone >= 1) throw new Error('Stick deadzone must be less than 1');
   if (c.simulation.step > 1 / 30 || c.simulation.maxFrameTime < c.simulation.step || c.simulation.maxFrameTime > 0.25) {
     throw new Error('Simulation timing must allow a stable timestep and bounded frame catch-up');

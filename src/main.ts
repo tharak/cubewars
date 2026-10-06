@@ -1,6 +1,6 @@
 import './style.css';
 import { validateConfig } from './game/config';
-import { formations } from './game/formations';
+import { formations, setFormation } from './game/formations';
 import { seededRandom } from './game/math';
 import { createGame, stepGame } from './game/simulation';
 import type { Formation } from './game/types';
@@ -12,10 +12,9 @@ const pauseIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M
 const restartIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8a8 8 0 1 1-1 8M5 3v5h5"/></svg>';
 const icons: Record<Formation, string> = {
   square: '<path d="M6 6h4v4H6zm8 0h4v4h-4zM6 14h4v4H6zm8 0h4v4h-4z"/>',
-  line: '<path d="M3 10h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4z"/>',
-  column: '<path d="M10 3h4v4h-4zm0 7h4v4h-4zm0 7h4v4h-4z"/>',
-  arrow: '<path d="m4 17 8-10 8 10M12 7v13"/>',
-  circle: '<circle cx="12" cy="12" r="7" stroke-dasharray="3 3"/>',
+  line: '<path d="M3 6h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4zM3 14h4v4H3zm7 0h4v4h-4zm7 0h4v4h-4z"/>',
+  column: '<path d="M6 3h4v4H6zm8 0h4v4h-4zM6 10h4v4H6zm8 0h4v4h-4zM6 17h4v4H6zm8 0h4v4h-4z"/>',
+  arrow: '<path d="M10 3h4v4h-4zM7 9h4v4H7zm6 0h4v4h-4zM4 15h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/>',
 };
 
 async function start(): Promise<void> {
@@ -30,7 +29,7 @@ async function start(): Promise<void> {
   const navigation = document.querySelector<HTMLElement>('#formations')!;
   let accumulator = 0;
   let uiSignature = '';
-  const chooseFormation = (formation: Formation) => { state.formation = formation; updateUI(); };
+  const chooseFormation = (formation: Formation) => { setFormation(state, formation, config); updateUI(); };
   const togglePause = () => {
     if (state.status === 'over') state = createGame(config);
     state.status = state.status === 'playing' ? 'paused' : 'playing';
@@ -39,8 +38,9 @@ async function start(): Promise<void> {
   const input = new Input(config.input.stickDeadzone, chooseFormation, togglePause);
   for (const [i, formation] of formations.entries()) {
     const button = document.createElement('button');
-    button.dataset.formation = formation; button.setAttribute('aria-label', `${formation} formation`);
-    button.title = `${formation} (${i + 1})`; button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[formation]}</svg>`;
+    const label = formation === 'line' ? 'row' : formation;
+    button.dataset.formation = formation; button.setAttribute('aria-label', `${label} formation`);
+    button.title = `${label} (${i + 1})`; button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[formation]}</svg>`;
     button.addEventListener('click', () => chooseFormation(formation)); navigation.append(button);
   }
   pause.addEventListener('click', togglePause); centerAction.addEventListener('click', togglePause);

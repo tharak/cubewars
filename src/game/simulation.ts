@@ -11,6 +11,7 @@ export function createGame(config: GameConfig): GameState {
     status: 'ready', center, heading: 0, formation: 'square',
     players: formationSlots('square', config.army.initialSize, config.army.spacing).map((p, i) => ({
       ...p, x: p.x + center.x, y: p.y + center.y, id: i + 1, health: config.army.health,
+      slot: { ...p },
       heading: 0, cooldown: (i % 5) * 0.035, hit: 0,
     })),
     enemies: [], bullets: [], wave: 0, kills: 0, pendingEnemies: 0, spawnTimer: 0,
@@ -22,20 +23,22 @@ export function createGame(config: GameConfig): GameState {
 export function stepGame(state: GameState, config: GameConfig, commands: Commands, dt: number, random: Random): void {
   if (state.status !== 'playing') return;
   state.time += dt;
+  const oldHeading = state.heading;
   const heading = commands.aim ?? state.heading + commands.rotation * config.army.rotationSpeed * dt;
   state.heading = Math.atan2(Math.sin(heading), Math.cos(heading));
-  const local = formationSlots(state.formation, state.players.length, config.army.spacing);
-  const slots = local.map(p => rotate(p, state.heading));
+  const slots = state.players.map(unit => rotate(unit.slot, state.heading));
   const padding = config.army.unitSize * Math.SQRT2 / 2;
   const minX = Math.min(...slots.map(p => p.x), 0), maxX = Math.max(...slots.map(p => p.x), 0);
   const minY = Math.min(...slots.map(p => p.y), 0), maxY = Math.max(...slots.map(p => p.y), 0);
-  const move = normalize(commands.move);
+  const relativeMove = rotate(commands.move, state.heading);
+  const move = normalize({ x: relativeMove.x + commands.worldMove.x, y: relativeMove.y + commands.worldMove.y });
   const oldCenter = { ...state.center };
   state.center.x = clamp(state.center.x + move.x * config.army.moveSpeed * dt, padding - minX, config.arena.width - padding - maxX);
   state.center.y = clamp(state.center.y + move.y * config.army.moveSpeed * dt, padding - minY, config.arena.height - padding - maxY);
   state.players.forEach((unit, i) => {
-    // Translate existing positions with the pivot, then independently approach new slots.
-    unit.x += state.center.x - oldCenter.x; unit.y += state.center.y - oldCenter.y;
+    // Movement/rotation carry the entire army rigidly, including casualty gaps.
+    const carried = rotate({ x: unit.x - oldCenter.x, y: unit.y - oldCenter.y }, state.heading - oldHeading);
+    unit.x = state.center.x + carried.x; unit.y = state.center.y + carried.y;
     const next = approach(unit, { x: state.center.x + slots[i].x, y: state.center.y + slots[i].y }, config.army.transitionSpeed * dt);
     unit.x = clamp(next.x, padding, config.arena.width - padding);
     unit.y = clamp(next.y, padding, config.arena.height - padding);

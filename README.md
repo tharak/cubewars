@@ -8,13 +8,13 @@ A formation survival game for desktop and phone browsers. Command a cube army, c
 
 | Action | Desktop | Touch |
 | --- | --- | --- |
-| Move | WASD | Left stick |
+| Move | W forward, S backward, A/D strafe relative to facing | Left stick in screen directions |
 | Rotate / aim | Q / E | Right stick |
-| Formation | 1 square, 2 line, 3 column, 4 arrow, 5 circle | Formation icons |
+| Formation | 1 square, 2 row (two rows), 3 column (two columns), 4 filled pyramid | Formation icons |
 | Start / pause / resume | Play/pause icon, Space or Escape | Play/pause icon |
 | Restart | Circular arrow icon | Circular arrow icon |
 
-Every cube automatically fires in the army's heading. The circle also shares one heading. Friendly cubes do not block friendly shots. Casualties persist and survivors reform; zero survivors ends the run. Defeat changes the central action to restart. Each cleared wave gives a short break before more enemies arrive. Backgrounding the game pauses it. Landscape offers a larger battlefield on phones, but portrait is supported.
+Every cube automatically fires in the army's heading. Friendly cubes do not block friendly shots. Casualties persist and leave gaps: surviving cubes keep their assigned slots through movement and rotation. Changing to a different formation rebuilds slots for the remaining army; selecting the active formation does not close gaps. The initial row/column layouts have two ranks of 13 and 12, and the pyramid has filled rows of 1, 3, 5, 7, and 9. Zero survivors ends the run. Defeat changes the central action to restart. Each cleared wave gives a short break before more enemies arrive. Backgrounding the game pauses it. Landscape offers a larger battlefield on phones, but portrait is supported.
 
 ## Development
 
@@ -39,7 +39,7 @@ The project follows a functional core / imperative shell boundary. Domain functi
 | --- | --- |
 | `src/game/types.ts` | State and shared command interfaces |
 | `src/game/config.ts` | Typed configuration and startup validation |
-| `src/game/formations.ts` | Pure centered local formation geometry; forward is negative Y |
+| `src/game/formations.ts` | Centered local geometry and explicit slot reassignment; forward is negative Y |
 | `src/game/math.ts` | Geometry, swept collisions, and seeded randomness |
 | `src/game/simulation.ts` | Fixed-timestep movement, formations, and domain orchestration |
 | `src/game/combat.ts` | Forward firing, earliest projectile impact, damage, casualties |
@@ -48,7 +48,7 @@ The project follows a functional core / imperative shell boundary. Domain functi
 | `src/render.ts` | Canvas presentation; no simulation changes |
 | `src/main.ts` | Configuration loading, lifecycle, UI, and frame scheduling |
 
-Rendering scales a fixed world into the available canvas; resizing never changes simulation coordinates. Unit positions and heading are shared by both desktop and touch. A future Capacitor shell can reuse this core and web presentation. Native packaging is deferred.
+Rendering scales a fixed world into the available canvas; resizing never changes simulation coordinates. Player units store local formation slots; casualties remove units without recalculating those slots. The simulation rigidly carries current positions with army movement/rotation and approaches slot targets during explicit formation transitions. Keyboard movement is local to army heading; touch movement is in world/screen directions. A future Capacitor shell can reuse this core and web presentation. Native packaging is deferred.
 
 ## Game configuration
 
@@ -64,7 +64,7 @@ Edit `public/config/game.json`. Values are loaded at startup; reload after chang
 | `simulation` | Fixed `step`, `maxFrameTime` for bounded catch-up |
 | `input` | `stickDeadzone` between 0 and 1 |
 
-All settings are finite positive numbers except `additionalPerWave` and `stickDeadzone`, which may be zero. Counts must be integers; army size is capped at 200. Spacing must fit units and the arena must accommodate a fully rotated line. Invalid configuration produces a minimal warning symbol and a detailed console error rather than silently substituting defaults.
+All settings are finite positive numbers except `additionalPerWave` and `stickDeadzone`, which may be zero. Counts must be integers; army size is capped at 200. Spacing must fit units and the arena must accommodate every rotated formation at every survivor count. Invalid configuration produces a minimal warning symbol and a detailed console error rather than silently substituting defaults.
 
 Enemies per wave = `initialEnemies + (wave - 1) * additionalPerWave`. Each enemy approaches to 75% of its attack range, faces the army pivot, and fires when in range. Config values deliberately live outside the simulation so balancing does not require editing gameplay code.
 
