@@ -9,6 +9,7 @@ export interface GameState {
   status: Status;
   center: Vec;
   heading: number;
+  formationAngle: number;
   formation: Formation;
   players: PlayerUnit[];
   enemies: Unit[];
@@ -22,5 +23,5 @@ export interface GameState {
   time: number;
 }
 // Keyboard movement is relative to army heading; the touch stick uses screen directions.
-export interface Commands { move: Vec; worldMove: Vec; rotation: number; aim: number | null }
+export interface Commands { move: Vec; worldMove: Vec; rotation: number; rotateFormation: number; aim: number | null }
 export type Random = () => number;

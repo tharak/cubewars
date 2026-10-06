@@ -18,7 +18,7 @@ const icons: Record<Formation, string> = {
 };
 
 async function start(): Promise<void> {
-  const response = await fetch(`${import.meta.env.BASE_URL}config/game.json`);
+  const response = await fetch(`${import.meta.env.BASE_URL}config/game.json`, { cache: 'no-cache' });
   if (!response.ok) throw new Error(`Unable to load game configuration (${response.status})`);
   const config = validateConfig(await response.json());
   let state = createGame(config);

@@ -2,7 +2,7 @@ import { formations, formationSlots } from './formations';
 
 export interface WeaponConfig { damage: number; interval: number; speed: number; lifetime: number; radius: number }
 export interface GameConfig {
-  army: { initialSize: number; spacing: number; unitSize: number; health: number; moveSpeed: number; rotationSpeed: number; transitionSpeed: number };
+  army: { initialSize: number; spacing: number; unitSize: number; health: number; moveSpeed: number; rotationSpeed: number; formationRotationSpeed: number; transitionSpeed: number };
   arena: { width: number; height: number };
   playerWeapon: WeaponConfig;
   enemy: { health: number; unitSize: number; moveSpeed: number; attackRange: number; spawnMargin: number };
@@ -13,7 +13,7 @@ export interface GameConfig {
 }
 
 const fields: Record<keyof GameConfig, string[]> = {
-  army: ['initialSize', 'spacing', 'unitSize', 'health', 'moveSpeed', 'rotationSpeed', 'transitionSpeed'],
+  army: ['initialSize', 'spacing', 'unitSize', 'health', 'moveSpeed', 'rotationSpeed', 'formationRotationSpeed', 'transitionSpeed'],
   arena: ['width', 'height'],
   playerWeapon: ['damage', 'interval', 'speed', 'lifetime', 'radius'],
   enemy: ['health', 'unitSize', 'moveSpeed', 'attackRange', 'spawnMargin'],

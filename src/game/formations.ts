@@ -35,6 +35,7 @@ export function formationSlots(shape: Formation, count: number, spacing: number)
 export function setFormation(state: GameState, shape: Formation, config: GameConfig): void {
   if (state.formation === shape) return;
   state.formation = shape;
+  state.formationAngle = 0;
   const slots = formationSlots(shape, state.players.length, config.army.spacing);
   state.players.forEach((unit, i) => { unit.slot = slots[i]; });
 }

@@ -10,7 +10,7 @@ import { advanceWaves } from '../src/game/waves';
 import type { Commands, PlayerUnit, Unit } from '../src/game/types';
 
 const config = validateConfig(defaults);
-const idle: Commands = { move: { x: 0, y: 0 }, worldMove: { x: 0, y: 0 }, rotation: 0, aim: null };
+const idle: Commands = { move: { x: 0, y: 0 }, worldMove: { x: 0, y: 0 }, rotation: 0, rotateFormation: 0, aim: null };
 const unit = (id: number, x: number, y: number, health = 3): Unit => ({ id, x, y, health, heading: 0, cooldown: 0, hit: 0 });
 const player = (id: number, x: number, y: number): PlayerUnit => ({ ...unit(id, x, y), slot: { x: 0, y: 0 } });
 
@@ -23,6 +23,7 @@ test('configuration rejects missing, non-finite, fractional, and unsafe settings
     (c: typeof defaults) => { c.arena.width = 40; },
     (c: typeof defaults) => { c.input.stickDeadzone = 1; },
     (c: typeof defaults) => { c.simulation.step = 1; },
+    (c: typeof defaults) => { c.army.formationRotationSpeed = 0; },
   ]) {
     const c = structuredClone(defaults); edit(c); assert.throws(() => validateConfig(c));
   }
@@ -137,12 +138,63 @@ test('casualties keep survivor slots and gaps through idle, movement, and rotati
   s.players.forEach((p, i) => assert.deepEqual(p.slot, slots[i]));
 });
 
+test('tactical rotation moves damaged cubes to the rear without changing aim, health, or casualty slots', () => {
+  const c = structuredClone(config); c.army.formationRotationSpeed = Math.PI;
+  const s = createGame(c); s.status = 'playing'; s.pendingEnemies = 1; s.spawnTimer = 1000;
+  const damaged = s.players[0]; damaged.health = 1;
+  s.players = s.players.filter(p => p.id !== 13);
+  const identities = s.players.map(p => ({ id: p.id, health: p.health, slot: { ...p.slot } }));
+  assert.ok(damaged.y < s.center.y);
+  for (let i = 0; i < 60; i++) stepGame(s, c, { ...idle, rotateFormation: 1 }, c.simulation.step, seededRandom(1));
+  assert.ok(damaged.y > s.center.y);
+  assert.equal(s.heading, 0);
+  assert.deepEqual(s.players.map(p => ({ id: p.id, health: p.health, slot: p.slot })), identities);
+  assert.ok(s.players.every(p => p.heading === 0));
+  assert.ok(s.bullets.length > 0 && s.bullets.every(b => b.vx === 0 && b.vy < 0));
+  const oldCenter = { ...s.center };
+  stepGame(s, c, { ...idle, move: { x: 0, y: -1 } }, c.simulation.step, seededRandom(1));
+  assert.equal(s.center.x, oldCenter.x); assert.ok(s.center.y < oldCenter.y);
+  const paused = structuredClone(s); s.status = 'paused';
+  stepGame(s, c, { ...idle, rotateFormation: -1 }, c.simulation.step, seededRandom(1));
+  assert.equal(s.formationAngle, paused.formationAngle);
+  s.status = 'playing';
+  for (let i = 0; i < 60; i++) stepGame(s, c, { ...idle, rotateFormation: -1 }, c.simulation.step, seededRandom(1));
+  assert.ok(Math.abs(s.formationAngle) < 1e-8);
+  for (const p of s.players) {
+    assert.ok(Math.abs(p.x - s.center.x - p.slot.x) < 1e-7);
+    assert.ok(Math.abs(p.y - s.center.y - p.slot.y) < 1e-7);
+  }
+});
+
+test('steering and tactical rotation use independent configured speeds and reset only on formation changes', () => {
+  const c = structuredClone(config); c.army.rotationSpeed = 1; c.army.formationRotationSpeed = 2;
+  const s = createGame(c); s.status = 'playing'; s.pendingEnemies = 1; s.spawnTimer = 1000;
+  for (let i = 0; i < 30; i++) stepGame(s, c, { ...idle, rotation: 1, rotateFormation: -1 }, c.simulation.step, seededRandom(1));
+  assert.ok(Math.abs(s.heading - 0.5) < 1e-8);
+  assert.ok(Math.abs(s.formationAngle + 1) < 1e-8);
+  for (const p of s.players) {
+    const expected = rotate(p.slot, s.heading + s.formationAngle);
+    assert.ok(Math.abs(p.x - s.center.x - expected.x) < 1e-7);
+    assert.ok(Math.abs(p.y - s.center.y - expected.y) < 1e-7);
+    assert.equal(p.heading, s.heading);
+  }
+  setFormation(s, 'square', c); assert.ok(Math.abs(s.formationAngle + 1) < 1e-8);
+  setFormation(s, 'arrow', c); assert.equal(s.formationAngle, 0);
+  assert.ok(Math.abs(s.heading - 0.5) < 1e-8);
+  for (let i = 0; i < 120; i++) stepGame(s, c, idle, c.simulation.step, seededRandom(1));
+  for (const p of s.players) {
+    const expected = rotate(p.slot, s.heading);
+    assert.ok(Math.abs(p.x - s.center.x - expected.x) < 1e-7);
+    assert.ok(Math.abs(p.y - s.center.y - expected.y) < 1e-7);
+  }
+});
+
 test('all formations remain bounded while rotating and reshaping at an edge', () => {
   const s = createGame(config); s.status = 'playing'; s.center = { x: 5, y: 5 };
   for (const shape of formations) {
     setFormation(s, shape, config);
     for (let i = 0; i < 120; i++) {
-      stepGame(s, config, { ...idle, move: { x: -1, y: -1 }, rotation: 1 }, config.simulation.step, seededRandom(1));
+      stepGame(s, config, { ...idle, move: { x: -1, y: -1 }, rotation: 1, rotateFormation: 1 }, config.simulation.step, seededRandom(1));
       for (const p of s.players) {
         const pad = config.army.unitSize * Math.SQRT2 / 2;
         assert.ok(p.x >= pad && p.x <= config.arena.width - pad);

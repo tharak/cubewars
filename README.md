@@ -8,13 +8,14 @@ A formation survival game for desktop and phone browsers. Command a cube army, c
 
 | Action | Desktop | Touch |
 | --- | --- | --- |
-| Move | W forward, S backward, A/D strafe relative to facing | Left stick in screen directions |
-| Rotate / aim | Q / E | Right stick |
+| Move | W forward, S backward relative to facing | Left stick in screen directions |
+| Rotate / aim | A / D | Right stick |
+| Rotate cube positions while keeping aim | Hold Q / E | Hold rotation icons beside formations |
 | Formation | 1 square, 2 row (two rows), 3 column (two columns), 4 filled pyramid | Formation icons |
 | Start / pause / resume | Play/pause icon, Space or Escape | Play/pause icon |
 | Restart | Circular arrow icon | Circular arrow icon |
 
-Every cube automatically fires in the army's heading. Friendly cubes do not block friendly shots. Casualties persist and leave gaps: surviving cubes keep their assigned slots through movement and rotation. Changing to a different formation rebuilds slots for the remaining army; selecting the active formation does not close gaps. The initial row/column layouts have two ranks of 13 and 12, and the pyramid has filled rows of 1, 3, 5, 7, and 9. Zero survivors ends the run. Defeat changes the central action to restart. Each cleared wave gives a short break before more enemies arrive. Backgrounding the game pauses it. Landscape offers a larger battlefield on phones, but portrait is supported.
+Every cube automatically fires in the army's heading. A/D turns the army and its firing direction; Q/E orbits cube positions around the pivot while keeping their aim fixed, allowing damaged cubes to move from the front toward the rear. W/S follows the firing direction even while positions rotate. Friendly cubes do not block friendly shots. Casualties persist and leave gaps: surviving cubes keep their assigned slots through movement and both rotations. Changing to a different formation rebuilds slots for the remaining army and aligns the new shape with its firing direction; selecting the active formation does not close gaps or reset tactical rotation. The initial row/column layouts have two ranks of 13 and 12, and the pyramid has filled rows of 1, 3, 5, 7, and 9. Zero survivors ends the run. Defeat changes the central action to restart. Each cleared wave gives a short break before more enemies arrive. Backgrounding the game pauses it. Landscape offers a larger battlefield on phones, but portrait is supported.
 
 ## Development
 
@@ -48,7 +49,7 @@ The project follows a functional core / imperative shell boundary. Domain functi
 | `src/render.ts` | Canvas presentation; no simulation changes |
 | `src/main.ts` | Configuration loading, lifecycle, UI, and frame scheduling |
 
-Rendering scales a fixed world into the available canvas; resizing never changes simulation coordinates. Player units store local formation slots; casualties remove units without recalculating those slots. The simulation rigidly carries current positions with army movement/rotation and approaches slot targets during explicit formation transitions. Keyboard movement is local to army heading; touch movement is in world/screen directions. A future Capacitor shell can reuse this core and web presentation. Native packaging is deferred.
+Rendering scales a fixed world into the available canvas; resizing never changes simulation coordinates. Player units store local formation slots; casualties remove units without recalculating those slots. State tracks firing `heading` and independent `formationAngle`; slot geometry uses their sum, while movement and shots use heading alone. The simulation rigidly carries current positions with army movement/both rotations and approaches slot targets during explicit formation transitions. Keyboard movement is forward/backward relative to heading; touch movement is in world/screen directions. A future Capacitor shell can reuse this core and web presentation. Native packaging is deferred.
 
 ## Game configuration
 
@@ -56,7 +57,7 @@ Edit `public/config/game.json`. Values are loaded at startup; reload after chang
 
 | Section | Fields |
 | --- | --- |
-| `army` | `initialSize`, `spacing`, `unitSize`, `health`, `moveSpeed`, `rotationSpeed`, `transitionSpeed` |
+| `army` | `initialSize`, `spacing`, `unitSize`, `health`, `moveSpeed`, `rotationSpeed` for steering, `formationRotationSpeed` for Q/E, `transitionSpeed` |
 | `arena` | `width`, `height` |
 | `playerWeapon`, `enemyWeapon` | `damage`, `interval` between shots, projectile `speed`, `lifetime`, `radius` |
 | `enemy` | `health`, `unitSize`, `moveSpeed`, `attackRange`, `spawnMargin` outside the arena |

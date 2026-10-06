@@ -6,11 +6,13 @@ button { display: grid; place-items: center; width: 44px; height: 44px; padding:
 button:hover { color: #e2f3ff; background: #162434; }
 button:focus-visible { outline: 2px solid #79e7e0; outline-offset: 2px; }
 button[aria-pressed="true"] { color: #79e7e0; border-color: #79e7e044; background: #79e7e010; }
+button.active { color: #79e7e0; border-color: #79e7e044; background: #79e7e010; }
 button:disabled { opacity: .3; cursor: default; }
 svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 #app { position: relative; height: 100dvh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 .toolbar { flex: 0 0 auto; min-height: 72px; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #172331; background: #0a111b; }
-.stats, .actions, nav { display: flex; align-items: center; gap: 6px; }
+.stats, .actions, nav, .position-controls, .formation-controls { display: flex; align-items: center; gap: 6px; }
+.formation-controls { gap: 10px; }
 .stats { gap: 20px; }
 .stat { display: flex; align-items: center; gap: 8px; font-size: 15px; min-width: 45px; }
 .stat svg { width: 20px; height: 20px; color: #657e96; }
@@ -35,12 +37,14 @@ body.touch #touch-controls { display: flex; }
   .toolbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; min-height: 106px; }
   .stats { order: 0; gap: 16px; }
   .actions { order: 1; margin-left: auto; }
-  nav { order: 2; width: 100%; justify-content: center; gap: 12px; }
+  .formation-controls { order: 2; width: 100%; justify-content: center; gap: 8px; }
+  nav, .position-controls { gap: 4px; }
   #center-action { top: 43%; }
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .toolbar { min-height: 54px; padding: 4px 12px; flex-wrap: nowrap; }
   nav { order: 0; width: auto; gap: 2px; }
+  .formation-controls { order: 0; width: auto; gap: 6px; }
   .actions { order: 0; margin-left: 0; }
   body.touch #touch-controls { position: absolute; top: calc(54px + env(safe-area-inset-top)); bottom: env(safe-area-inset-bottom); left: env(safe-area-inset-left); right: env(safe-area-inset-right); height: auto; padding: 12px 16px; pointer-events: none; }
   body.touch #touch-controls .stick { pointer-events: auto; }

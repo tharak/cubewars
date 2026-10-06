@@ -14,7 +14,13 @@
           <span class="stat" aria-label="Wave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 15 5-6 4 6 4-6 5 6"/></svg><output id="wave">0</output></span>
           <span class="stat friendly" aria-label="Surviving cubes"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg><output id="survivors">25</output></span>
         </div>
-        <nav id="formations" aria-label="Formation"></nav>
+        <div class="formation-controls">
+          <nav id="formations" aria-label="Formation"></nav>
+          <div class="position-controls" role="group" aria-label="Rotate cube positions">
+            <button id="rotate-positions-left" aria-label="Rotate cube positions counterclockwise" title="Rotate positions (Q)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="6" height="6"/><path d="M5 8a8 8 0 1 1-1 8M5 3v5h5"/></svg></button>
+            <button id="rotate-positions-right" aria-label="Rotate cube positions clockwise" title="Rotate positions (E)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="6" height="6"/><path d="M19 8a8 8 0 1 0 1 8M19 3v5h-5"/></svg></button>
+          </div>
+        </div>
         <div class="actions">
           <button id="pause" aria-label="Start" title="Start"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></svg></button>
           <button id="restart" aria-label="Restart" title="Restart"><svg viewBox="0 0 24 24"><path d="M5 8a8 8 0 1 1-1 8M5 3v5h5"/></svg></button>
